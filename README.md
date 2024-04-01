@@ -22,3 +22,34 @@
 - 通过```arr.slice(start,end)```截取，需要随着滚动条滚动动态展示数据
 - 通过CSS的translateY属性修正渲染区域与可视区域偏移的问题
 - 通过js获取scrollTop,滚动条滚动的高度
+
+---
+
+
+
+### 使用canvas进行图片压缩
+
+#### 原理
+
+- input 读取到 文件 ，使用 FileReader 将其转换为 base64 编码
+
+- 新建 img ，使其 src 指向刚刚的 base64
+
+- 新建 canvas ，将 img 画到 canvas 上
+
+- 利用 canvas.toDataURL/toBlob 将 canvas 导出为 base64 或 Blob
+
+- 将 base64 或 Blob 转化为 File
+
+- canvas.toDataURL时涉及到图片质量设置，一般为0.92
+
+  ref:
+
+  https://juejin.cn/post/6940430496128040967
+
+  https://juejin.cn/post/6844904082046451719
+
+  https://juejin.cn/post/7263123522283651133#heading-0
+
+---
+
