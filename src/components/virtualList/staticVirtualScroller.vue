@@ -110,10 +110,52 @@ function onScroll(event) {
 
   // 获取滚动的距离
   //   console.log(`output->event`, event);
-  const { scrollTop } = scrollDom;
+  const { scrollTop, scrollHeight, clientHeight } = scrollDom;
   // 根据滚动的距离，计算此时视口顶部需要显示的第一个元素
   start.value = Math.floor(scrollTop / itemHeight.value);
   startOffset.value = start.value * itemHeight.value;
+
+  // 计算有了缓冲之后的start位置，根据有了缓冲之后的start位置来计算startOffset
+  // 多缓存一页
+
+  appendData(scrollTop, scrollHeight, clientHeight);
+}
+const dataLoading = ref(false);
+const hasMoreData = ref(true);
+/***
+ * 是否滚到了底部
+ */
+function isScrollEnd(scrollTop, scrollHeight, clientHeight) {
+  // Math.abs(scrollHeight - clientHeight - scrollTop) < 1 : 判断滚动条是否滚动到了最底部。公式来自MDN
+  // return Math.abs(scrollHeight - clientHeight - scrollTop) < 1
+  /*
+  上面公式可以判断完全滚动到了最底部，实际更人性化的方式是，接近底部的时候就开始加载数据，让用户在无感知的情况下就加载了后续数据，因此可以将1调整到一个适合你项目的值
+   */
+  return Math.abs(scrollHeight - clientHeight - scrollTop) < 1000;
+}
+async function appendData(scrollTop, scrollHeight, clientHeight) {
+  if (
+    !dataLoading.value &&
+    hasMoreData.value &&
+    isScrollEnd(scrollTop, scrollHeight, clientHeight)
+  ) {
+    dataLoading.value = true;
+    try {
+      const dataList = await loadData();
+      if (dataList && dataList.length > 0) {
+        allData.value.push(...dataList);
+        hasMoreData.value = true;
+      } else {
+        /*
+         * 这里判断下次滚动到底部是否还有数据可加载，是根据最后一次请求的请求结果是否有数据来判断的，实际不应该这么做，
+         *因为这会导致多发一次请求。更好的方式应该是每个请求结果中都包含一个字段用于告知前端是否还能请求后端来获取更多数据。
+         */
+        hasMoreData.value = false;
+      }
+    } catch (err) {
+      alert(err);
+    }
+  }
 }
 </script>
 
@@ -127,6 +169,7 @@ function onScroll(event) {
         <div class="item" v-for="item in renderData" :key="item">
           {{ item }}
         </div>
+        <div class="loadingDiv" v-if="dataLoading">数据加载中...</div>
       </div>
     </div>
   </div>
@@ -135,7 +178,7 @@ function onScroll(event) {
 <style lang="less" scoped>
 .container {
   height: 350px;
-  width: 50%;
+  width: 100%;
   border: 1px solid black;
 }
 .scrollerContaier {
@@ -167,5 +210,10 @@ function onScroll(event) {
   &:last-child {
     border-bottom: none;
   }
+}
+.loadingDiv {
+  text-align: center;
+  color: red;
+  font-weight: bold;
 }
 </style>

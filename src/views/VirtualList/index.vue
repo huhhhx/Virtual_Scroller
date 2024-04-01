@@ -8,4 +8,9 @@ import { ref, reactive } from "vue";
 import VirtualScroller from "@/components/virtualList/staticVirtualScroller.vue";
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+h3 {
+  text-align: center;
+  line-height: 30px;
+}
+</style>

@@ -1,6 +1,5 @@
 <script setup>
 import { RouterLink, RouterView } from "vue-router";
-import VirtualScroller from "./components/virtualList/staticVirtualScroller.vue";
 </script>
 
 <template>
